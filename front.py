@@ -45,7 +45,7 @@ if check_internet_connection():
             # Display a spinner while waiting for the response
             with st.spinner('Processing...'):
                 # Send a POST request to your Flask backend
-                backend_url = 'https://backt.onrender.com/api/download'
+                backend_url = 'https://video-download-9jmu.onrender.com'
                 response = requests.post(backend_url, data={'url': video_url})
 
                 if response.status_code == 200:
