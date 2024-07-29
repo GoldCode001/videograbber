@@ -11,7 +11,7 @@ def main():
     if st.button('Process Video'):
         # Display a spinner while waiting for the response
         with st.spinner('Processing...'):
-            backend_url = 'https://your-backend-url.com/download'
+            backend_url = 'https://video-download-9jmu.onrender.com/download'
             response = requests.post(backend_url, data={'url': video_url})
 
             if response.status_code == 200:
