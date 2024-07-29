@@ -40,8 +40,19 @@ if check_internet_connection():
         # Create a text input field for the video URL
         video_url = st.text_input('Enter the video URL')
 
+        # Validate the video URL
+        if video_url:
+            try:
+                parsed_url = urllib.parse.urlparse(video_url)
+                if not parsed_url.scheme or not parsed_url.netloc:
+                    st.error("Please enter a valid URL.")
+                    return
+            except ValueError:
+                st.error("Invalid URL format.")
+                return
+
         # Create a button to trigger the download
-        if st.button('Process Video'):
+        if st.button('Process Video') and video_url:
             # Display a spinner while waiting for the response
             with st.spinner('Processing...'):
                 # Send a POST request to your Flask backend
@@ -55,7 +66,7 @@ if check_internet_connection():
                         # Fetch the video information from yt-dlp
                         decoded_url = urllib.parse.unquote(video_url)
                         ydl_opts = {
-                            'format': 'best',  # You can adjust the format based on your requirements
+                            'format': 'best',
                             'quiet': True,
                         }
                         with yt_dlp.YoutubeDL(ydl_opts) as ydl:
