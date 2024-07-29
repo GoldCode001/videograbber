@@ -40,51 +40,30 @@ if check_internet_connection():
         # Create a text input field for the video URL
         video_url = st.text_input('Enter the video URL')
 
-        # Validate the video URL
-        if video_url:
-            try:
-                parsed_url = urllib.parse.urlparse(video_url)
-                if not parsed_url.scheme or not parsed_url.netloc:
-                    st.error("Please enter a valid URL.")
-                    return
-            except ValueError:
-                st.error("Invalid URL format.")
-                return
-
         # Create a button to trigger the download
-        if st.button('Process Video') and video_url:
+        if st.button('Process Video'):
             # Display a spinner while waiting for the response
             with st.spinner('Processing...'):
-                # Send a POST request to your Flask backend
-                backend_url = 'https://video-download-9jmu.onrender.com/download'
+                # Send a POST request to fetch video info from the backend
+                backend_url = 'https://video-download-9jmu.onrender.com/fetch-video-info'
                 response = requests.post(backend_url, data={'url': video_url})
 
                 if response.status_code == 200:
-                    download_links = response.json()
-                    st.write('Download Links:')
-                    for i, link in enumerate(download_links, start=1):
-                        # Fetch the video information from yt-dlp
-                        decoded_url = urllib.parse.unquote(video_url)
-                        ydl_opts = {
-                            'format': 'best',
-                            'quiet': True,
-                        }
-                        with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                            info = ydl.extract_info(decoded_url, download=False)
-                            title = info.get('title', f'downloaded_video_{i}')
-                            thumbnail_url = info.get('thumbnail')
+                    data = response.json()
+                    download_url = data.get('download_url')
+                    title = data.get('title', 'downloaded_video')
 
+                    if download_url:
                         # Display video title and preview
-                        st.subheader(f'Video Title:')
+                        st.subheader('Video Title:')
                         st.write(f'Video Name: {title}')
 
-                        # Fetch the video content from the provided link
-                        video_content = requests.get(link).content
-
-                        # Create a download button with the video content and the video title as the filename
-                        st.download_button(f'Download Video {i}', data=video_content, file_name=f'{title}.mp4', key=f'download_button_{i}')
+                        # Create a download button with the video content
+                        st.write(f'[Download Video]({download_url})')
+                    else:
+                        st.error('No download URL found.')
                 else:
-                    st.error(f'Error fetching download links: Status Code {response.status_code}')
+                    st.error(f'Error fetching video info: Status Code {response.status_code}')
 
         # Introduction and donation section
         st.write("""Please consider donating any amount you have, this free tool was built with python by Goldman precious, and any donation you make will be very much appreciated💚🌍. With love from nigeria""")
@@ -101,16 +80,6 @@ if check_internet_connection():
             unsafe_allow_html=True
         )
         st.write("""
-
-
-
-
-
-
-
-
-
-
         """)
         st.markdown(
             """
@@ -124,8 +93,8 @@ if check_internet_connection():
         st.markdown(
             """
             1. Enter the URL of the video you want to download in the provided text input field.
-            2. Click the "Download" button to start the download process.
-            3. Once the download links are available, you can preview the video, see its name, and download it to your device.
+            2. Click the "Process Video" button to start the download process.
+            3. Once the video information is available, you can preview the video title and download it.
             """
         )
 
