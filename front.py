@@ -57,7 +57,7 @@ if check_internet_connection():
             with st.spinner('Processing...'):
                 # Send a POST request to your Flask backend
                 backend_url = 'https://video-download-9jmu.onrender.com/download'
-                response = requests.post(backend_url, data={'url': video_url}))
+                response = requests.post(backend_url, data={'url': video_url})
 
                 if response.status_code == 200:
                     download_links = response.json()
